@@ -1,0 +1,5 @@
+jgg:
+  rabbitmq:
+    queue: jgg.queue
+kafka:
+  bootstrap-servers: localhost:9092
