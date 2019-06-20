@@ -2,7 +2,6 @@ package com.javasampleapproach.rabbitmq.subcriber;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.concurrent.ExecutionException;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
@@ -23,8 +22,7 @@ public class Subcriber {
 
 	@Autowired
     Sender sender;
-	
-	
+		
 	@RabbitListener(queues="${jgg.rabbitmq.queue}", containerFactory="rabbitListenerContainerFactory")
     //public String recievedMessage(String msg) {
 		public void recievedMessage(byte[] bytes, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
