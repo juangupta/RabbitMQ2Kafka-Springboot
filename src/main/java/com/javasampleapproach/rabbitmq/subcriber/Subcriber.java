@@ -24,8 +24,6 @@ public class Subcriber {
 	@Autowired
     Sender sender;
 	
-	Channel channel;
-	public long tag;
 	
 	@RabbitListener(queues="${jgg.rabbitmq.queue}", containerFactory="rabbitListenerContainerFactory")
     //public String recievedMessage(String msg) {
@@ -33,27 +31,29 @@ public class Subcriber {
 		String msg = new String(bytes);
         System.out.println(new Timestamp(System.currentTimeMillis()) + " - Recieved Message: " + msg);
         ListenableFuture<SendResult<String, String>> future = sender.send(msg);
-        this.channel = channel;
-        this.tag = tag;
         
         future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
 
             @Override
             public void onSuccess(SendResult<String, String> result) {
-            	System.out.println("Sent sample message");           	
+            	System.out.println("Sent sample message");
+            	try {
+					channel.basicAck(tag, false);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             }
             @Override
             public void onFailure(Throwable ex) {
                 System.out.println("Unable to send message due to : " + ex.getMessage());
+                try {
+					channel.basicNack(tag, false, true);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             }
         });
-        try {
-			System.out.println(future.get().getProducerRecord().value());
-			channel.basicAck(tag, false);
-			
-		} catch (ExecutionException | InterruptedException e) {
-			channel.basicNack(tag, false, true);
-			e.printStackTrace();
-		}
     }
 }
